@@ -15,6 +15,8 @@ parser.add_argument('--restore_file', default='best', help="name of the file in 
                      containing weights to load")
 
 
+# hola guapisimo
+
 def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
     
     model.eval()
