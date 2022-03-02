@@ -7,7 +7,7 @@ extracción de entidades](https://jaspock.github.io/mtextos/bloque2_practica.htm
 basa en el código del curso [CS230](https://github.com/cs230-stanford/cs230-code-examples) 
 de la Universidad de Stanford.
 
-**Autor de los comentarios:** Nombre Completo
+**Autor de los comentarios:** Gilbert Lurduy & Enrique Moreno
 
 Este módulo crea los siguientes ficheros a partir del contenido del directorio indicado 
 como argumento: `words.txt`, que contiene...; `tags.txt`, que contiene...
@@ -36,7 +36,7 @@ UNK_WORD = 'UNK'
 def save_vocab_to_txt_file(vocab, txt_path):
     """
     ### Función `save_vocab_to_txt_file`
-    Descripción detallada de la función.
+    Escribe archivos para guardar las palabras y sus etiquetas correspondientes (por separado).
 
     #### Parámetros:
 
