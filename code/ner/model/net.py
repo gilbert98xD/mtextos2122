@@ -4,20 +4,52 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# AQUI DEFINIMOS UNA RED NEURONAL
+
+##NN.MODULE ES U MODELO NEURONAL BASICO, LUEGO PUEDO PARTICULARIZAR O HEREDAR DE EL
+## NN.MODULE ES UNA CLASE BASE?
+
 class Net(nn.Module):
 
-    def __init__(self, params):
+    def __init__(self, params): # EL CONSTRUCTOR, CUANDO CREAMOS UN NUEVO OBEJTO DE LA CLASE SE LLAMA?
+    # DEFINE LAS CAPAS DE TU RED NEURONAL
 
-        super(Net, self).__init__()
+        super(Net, self).__init__() # LLAMA AL CONSTRUCTOR DEL PADRE
+        # SE LE PIDE AL PDRE QUE CONSTRUYA SU CLASE Y LUEGO YA EL RESTO DE ESTA CLASE
+
+        # COMPONENTES QUE TNEDRÁ LA RED NUERONAL, 
+        # MATRIZ DE EMBEDDINGS
+
+        # SE LE DA EL TAMAÑO, EL TAMAÑO DEL VOCABULARIO, PARAMS.VOCAB_SIZE
+        # LAS DIMENSIONES LAS DECIDO YO, 
 
         self.embedding = nn.Embedding(params.vocab_size, params.embedding_dim)
+        #
+
+
+        # DE ABAJO LE LLEGA 
+        # PROYECTA .. A OTR ADIMENSION PARAMS.LSTM_HIDDEN_DIM
+
+        # SE PROYECTA A UNNUEVO PUNTO DEL ESPACIO
+        # EL DE ENTRADA, Y EL PROYECTADO (CONTEXTUAL) NO TIENEN PORQUE TENER EL MISMO TAMAÑO, 
+        # OPR ESO SE PONE LAS DIMENSIONES
 
         self.lstm = nn.LSTM(params.embedding_dim,
                             params.lstm_hidden_dim, batch_first=True)
 
+
+
+        # MATRIZ
+
+
+        # PARAMS.NUMBER_OF_TAGS:
+        # TANTOS NUMEROS COMO ETIQUETAS TENGA, ME DICE LA PROB DE QUE LA PALABRA SEA UN NOMBRE, LUGAR, TIEMPO,.. O CASI?
         self.fc = nn.Linear(params.lstm_hidden_dim, params.number_of_tags)
 
-    def forward(self, s):
+        # CONLSUION: TENEOMS TRES CAPAS, EMBEDDING, LSTM Y FC
+
+    def forward(self, s): # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
+    # HACIA DELANTEÇ??
 
         s = self.embedding(s)
 
