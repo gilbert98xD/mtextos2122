@@ -5,11 +5,10 @@ import shutil
 
 import torch
 
-
-# ESTO EN MAYÚSCULASSS
-# perimte leer un fichero de parametros, leemos un ficheor json que dice {"a":1,"b":2}
-# la idea es convertir esto a un objeto de javascript para luego hacer x.a y x.b para que
-# nos de 1 y 2
+"""
+En este archivo utils.py se definen dos clases: 'Params' y 'Runnin Average'. Se define una función para establecer 
+los registros y dos funciones relacionadas con guardar y cargar los 'checkpoints' de los modelos. 
+"""
 
 class Params():
     """
@@ -60,7 +59,7 @@ class RunningAverage():
 
 def set_logger(log_path):
     """
-    ESTABLECE DOS LOGGERS PARA IR ENVIANDO LA INFORACION,POR UN LADO FICHEORS Y LUEGO FORMA ESTÁNDARD
+    Establece dos loggers para enviar la información a un fichero y a consola
     """
 
     logger = logging.getLogger() # se crea un objeto logger
@@ -125,14 +124,18 @@ def save_checkpoint(state, is_best, checkpoint):
 
 
 def load_checkpoint(checkpoint, model, optimizer=None):
-   
+   """
+   Carga del fichero checkpoint con la información del modelo
+   """
     if not os.path.exists(checkpoint):
         raise ("File doesn't exist {}".format(checkpoint))
-    checkpoint = torch.load(checkpoint) # ES UNDICIONARI, STATE-:DCIT TIENE LOS PESOS DE LA RED NEURONAL
-    model.load_state_dict(checkpoint['state_dict'])
+    checkpoint = torch.load(checkpoint) # carga del checkpoint (en un diccionario)
+    model.load_state_dict(checkpoint['state_dict']) # cargamos el estado del modelo con 
+    # la llave 'state_dict', la cual contiene los pesos de la red neuronal
 
-    if optimizer: # OPTIMIZADOR DEL LEARNING RATE?
-        optimizer.load_state_dict(checkpoint['optim_dict']) # GUARDA
+    if optimizer: 
+        optimizer.load_state_dict(checkpoint['optim_dict']) 
+        # # en el caso de que haya optimizador se carga también mediante la llave 'optim_dict'
 
     return checkpoint
     
