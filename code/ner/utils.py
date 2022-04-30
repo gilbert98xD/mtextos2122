@@ -18,10 +18,9 @@ class Params():
 
     def __init__(self, json_path):
         with open(json_path) as f:
-            params = json.load(f)
-            self.__dict__.update(params) # actualización del diccionario
-            # cualquier OBJETO DE JAVASCRIPT TIEEN UN OBJECTO __dict__ DICCIONARIO DE ATRIBUTOS DEL OBJETO
-            # LE PASAMOS UNOS ATRIBUTOS params y LO QUE HACE ES ME...?
+            params = json.load(f) # carga del fichero json_path, se obtiene un objeto json
+            self.__dict__.update(params) # actualización del diccionario de atributos del objeto
+            
 
     def save(self, json_path):
         with open(json_path, 'w') as f:
