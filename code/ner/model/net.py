@@ -61,10 +61,13 @@ class Net(nn.Module):
     # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS
     # CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
     # HACIA DELANTEÇ??
+        # variable input s, con dimensiones x
 
-        s = self.embedding(s)
 
-        s, _ = self.lstm(s)
+        s = self.embedding(s) # aplicamos una capa de embedding
+        # las dimensiones resultantes son(x,dimension de los embeddings)
+
+        s, _ = self.lstm(s) # aplicación de una LSTM
 
         s = s.contiguous()
 
