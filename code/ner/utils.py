@@ -6,7 +6,14 @@ import shutil
 import torch
 
 """
-En este archivo utils.py se definen dos clases: 'Params' y 'Runnin Average'. Se define una función para establecer 
+## Minería de textos
+Universidad de Alicante, curso 2021-2022
+Esta documentación forma parte de la práctica "[Lectura y documentación de un sistema de
+extracción de entidades](https://jaspock.github.io/mtextos/bloque2_practica.html)" y se 
+basa en el código del curso [CS230](https://github.com/cs230-stanford/cs230-code-examples) 
+de la Universidad de Stanford.
+**Autores de los comentarios:** Gilbert Lurduy & Enrique Moreno
+Este módulo define dos clases: 'Params' y 'Runnin Average'. Se define una función para establecer 
 los registros y dos funciones relacionadas con guardar y cargar los 'checkpoints' de los modelos. 
 """
 
