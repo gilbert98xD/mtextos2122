@@ -54,7 +54,7 @@ class RunningAverage():
 
     def __call__(self):
         return self.total / float(self.steps) # obtención de la media de los valores final
-        
+
 
 
 
@@ -103,26 +103,27 @@ def save_dict_to_json(d, json_path):
 
 def save_checkpoint(state, is_best, checkpoint):
     """
-    Si jo l'estiro fort per aquí i tu l'estires fort per allà, segur que tomba tomba tomba, ben corcada deu ser ja
+    Guarda los 'checkpoints' (fichero con todos los parámetros del modelo pytorch)
+
+    - state: diccionario del modelo
+    - is_best:  booleano que determina si el modelo es el mejor que se ha obtenido hasta entonces
+    - checkpoint: string indicando dónde guardar
     """
 
     filepath = os.path.join(checkpoint, 'last.pth.tar')
-    if not os.path.exists(checkpoint):
+    if not os.path.exists(checkpoint): # si no existe el directorio checkpoint, entonces lo crea
         print("Checkpoint Directory does not exist! Making directory {}".format(checkpoint))
         os.mkdir(checkpoint) # creación del directorio
     else:
         print("Checkpoint Directory exists! ")
-    torch.save(state, filepath)
+    torch.save(state, filepath) # guarda las características del modelo en 'filepath'
     if is_best:
-        shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.tar'))
-        # COPIA EL CHECKPOINT QUE YA HABÍOAS GRTABADO, COPIALO EN BEST, 
-        # PORQUE PRA CREAR EL BINARIO COMPRIMRI OTRA VEZ PUES TARDA MÁS
+        shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.tar')) 
+        # en el caso de que el modelo sea el mejor, se copia su
+        #  checkpoint grabado de filepath en 'best.pth.tar'
 
 
-# SE SUELE GUARDAR EL ULTMI MODELO YEL MEJOR
 
-
-#
 def load_checkpoint(checkpoint, model, optimizer=None):
    
     if not os.path.exists(checkpoint):
