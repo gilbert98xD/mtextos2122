@@ -5,73 +5,70 @@ import shutil
 
 import torch
 
-"""
-Creación de una clase que, a paritir de un archivo tipo json, 
-carga los parámetros 
-"""
+
 # ESTO EN MAYÚSCULASSS
 # perimte leer un fichero de parametros, leemos un ficheor json que dice {"a":1,"b":2}
 # la idea es convertir esto a un objeto de javascript para luego hacer x.a y x.b para que
 # nos de 1 y 2
 
 class Params():
+    """
+    Carga los parámetros contenidos en un archivo tipo json
+    """
 
     def __init__(self, json_path):
         with open(json_path) as f:
-            params = json.load(f) # carga del fichero json_path, se obtiene un objeto json
-            self.__dict__.update(params) # actualización del diccionario de atributos del objeto
+            params = json.load(f) # carga del fichero json_path del se obtiene un objeto json
+            self.__dict__.update(params) # actualización del diccionario built-in de atributos del objeto
             
 
     def save(self, json_path):
         with open(json_path, 'w') as f:
             json.dump(self.__dict__, f, indent=4)
-            # estas dos líneas de código guardan el diccionario en formato json
-            # la identación es de 4 espacios
+            # escribe/guarda el diccionario actualizado en el archhivo json_path
+            # con una identación de 4 espacios
 
-    def update(self, json_path):
+    def update(self, json_path): # método que hace la misma función que el constructor
         with open(json_path) as f:
             params = json.load(f)
             self.__dict__.update(params)
 
-    @property
-    def dict(self): # ASI SE PUEDE METER AUTOMICAITMENTE A TODOS LOS ATRIBUTOS?
-        return self.__dict__
+    @property # decorador
+    def dict(self): 
+        return self.__dict__ # nos devuelve el diccionario de atributos del objeto creado con esta clase
 
 
-"""
-Clase para tener el 'running average' de cualquier variable
-"""
-
-# LE AÑADES VALAORES Y EN CUALQUIE RMOMENTO NOS PUEDE DAR LA MEDIA DE LOS VALORES AÑADIDOS
 
 class RunningAverage():
+    """
+    Obtención de la cantidad 'running average' de cualquier variable
+    """
 
-    def __init__(self):
-        self.steps = 0
+    def __init__(self): # el constructor inicializa los pasos
+        self.steps = 0 
         self.total = 0
 
-    def update(self, val):
+    def update(self, val): 
         self.total += val # actualizaciones del valor total y de los pasos
         self.steps += 1
 
     def __call__(self):
-        return self.total / float(self.steps)
+        return self.total / float(self.steps) # obtención de la media de los valores final
+        
 
-
-
-# ESTABLECE DOS LOGGERS PARA IR ENVIANDO LA INFORACION,POR UN LADO FICHEORS Y LUEGO FORMA ESTÁNDARD
-# 
 
 
 def set_logger(log_path):
+    """
+    ESTABLECE DOS LOGGERS PARA IR ENVIANDO LA INFORACION,POR UN LADO FICHEORS Y LUEGO FORMA ESTÁNDARD
+    """
 
     logger = logging.getLogger() # se crea un objeto logger
     logger.setLevel(logging.INFO) # se establece el nivel del logger. Se guardaran los logs
     # de tipo INFO o superior (debug,notset)
 
-    if not logger.handlers: # si no hay un handler, creamos un uno, este
-    # espeicifica a que tipo de archivo se envia el registro(log)
-
+    if not logger.handlers: # si no hay un handler se creará uno; éste
+    # especifica a qué tipo de archivo se envía el registro (log)
 
         file_handler = logging.FileHandler(log_path) # handler que guarda el registro
         # en archivos del disco
@@ -82,7 +79,7 @@ def set_logger(log_path):
         stream_handler.setFormatter(logging.Formatter('%(message)s'))
         # la línea de código inmediatamente superior sólo especifica el formato
         # del log 
-        logger.addHandler(stream_handler)
+        logger.addHandler(stream_handler) # adición del stream handler al logger
 
 
 def save_dict_to_json(d, json_path):
@@ -92,7 +89,7 @@ def save_dict_to_json(d, json_path):
  
     with open(json_path, 'w') as f:
         d = {k: float(v) for k, v in d.items()} # conversión a floats de los items de d
-        json.dump(d, f, indent=4)
+        json.dump(d, f, indent=4) # se guarda d en f (json_path)
 
 
 # UN CHECKPOIINT ES UN FICEHRO QUE CONITNEE UN MODELO DE PYTORCH
@@ -105,11 +102,14 @@ def save_dict_to_json(d, json_path):
 
 
 def save_checkpoint(state, is_best, checkpoint):
-    
+    """
+    Si jo l'estiro fort per aquí i tu l'estires fort per allà, segur que tomba tomba tomba, ben corcada deu ser ja
+    """
+
     filepath = os.path.join(checkpoint, 'last.pth.tar')
     if not os.path.exists(checkpoint):
         print("Checkpoint Directory does not exist! Making directory {}".format(checkpoint))
-        os.mkdir(checkpoint)
+        os.mkdir(checkpoint) # creación del directorio
     else:
         print("Checkpoint Directory exists! ")
     torch.save(state, filepath)
