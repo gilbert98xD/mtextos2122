@@ -58,33 +58,40 @@ class Net(nn.Module):
 
 
     def forward(self, s): 
+        """
+        Funcionalidad??
+        """
     # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS
     # CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
     # HACIA DELANTEÇ??
         # variable input s, con dimensiones x
-
 
         s = self.embedding(s) # aplicamos una capa de embedding
         # las dimensiones resultantes son(x,dimension de los embeddings)
 
         s, _ = self.lstm(s) # aplicación de una LSTM
 
-        s = s.contiguous()
+        s = s.contiguous() # se hace una copia del tensor en memoria
 
-        s = s.view(-1, s.shape[2])
+        s = s.view(-1, s.shape[2]) # cambiamos la forma de la variable s de tal manera que
+        # cada fila tiene un token
 
-        s = self.fc(s)
+        s = self.fc(s) # aplicación de capa 'fully-connected'
 
-        return F.log_softmax(s, dim=1)
+        return F.log_softmax(s, dim=1) # aplicamos una softmax seguida del logarimto log(softmax(argument)) 
+        # en la dimensión indicada
 
 
 def loss_fn(outputs, labels): 
     """
     método función de pérdida
     """
-    labels = labels.view(-1)
+    labels = labels.view(-1) # aplana la variable
 
-    mask = (labels >= 0).float()
+    mask = (labels >= 0).float() # para que coincidan los tamaños de las muestras se hace 'padding', que es
+    # añadir ceros a las secuencias para la coincidencia. Estos token tienen -1 como etiqueta, por lo que
+    # con esta línea de código los excluimos del cálculo de la función de pérdida
+    # (ALMENOS YO LO HE ENTENDIDO ASÍ)
 
     labels = labels % outputs.shape[1]
 
