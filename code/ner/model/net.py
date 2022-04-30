@@ -1,3 +1,19 @@
+"""
+## Minería de textos
+Universidad de Alicante, curso 2021-2022
+
+Esta documentación forma parte de la práctica "[Lectura y documentación de un sistema de
+extracción de entidades](https://jaspock.github.io/mtextos2122/bloque2_practica.html)" y se 
+basa en el código del curso [CS230](https://github.com/cs230-stanford/cs230-code-examples) 
+de la Universidad de Stanford.
+
+**Autores de los comentarios:** Gilbert Lurduy & Enrique Moreno
+
+Este módulo define la red neuronal, la función de pérdida y la métrica de aciertos
+para la evaluación del modelo. Se hace uso de la libería torch
+"""
+
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -10,6 +26,9 @@ import torch.nn.functional as F
 ## NN.MODULE ES UNA CLASE BASE?
 
 class Net(nn.Module):
+    """
+    Definición de la clase 'red neuronal'
+    """
 
     def __init__(self, params): # EL CONSTRUCTOR, CUANDO CREAMOS UN NUEVO OBEJTO DE LA CLASE SE LLAMA?
     # DEFINE LAS CAPAS DE TU RED NEURONAL
