@@ -1,3 +1,18 @@
+"""
+## Minería de textos
+Universidad de Alicante, curso 2021-2022
+
+Esta documentación forma parte de la práctica "[Lectura y documentación de un sistema de
+extracción de entidades](https://jaspock.github.io/mtextos2122/bloque2_practica.html)" y se 
+basa en el código del curso [CS230](https://github.com/cs230-stanford/cs230-code-examples) 
+de la Universidad de Stanford.
+
+**Autores de los comentarios:** Gilbert Lurduy & Enrique Moreno
+
+Este módulo ...
+"""
+
+
 import argparse
 import logging
 import os
@@ -15,9 +30,11 @@ parser.add_argument('--restore_file', default='best', help="name of the file in 
                      containing weights to load")
 
 
-# hola guapisimo
 
 def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
+    """
+
+    """
     
     model.eval()
 
@@ -27,7 +44,8 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
     
     for _ in range(num_steps):
     
-        data_batch, labels_batch = next(data_iterator)
+        data_batch, labels_batch = next(data_iterator) # obtenemos los datos y las etiquetas de cada batch
+        # data_iterator nos da un generador con el cual podemos iterar 
    
         output_batch = model(data_batch)
         loss = loss_fn(output_batch, labels_batch)
