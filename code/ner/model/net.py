@@ -25,8 +25,12 @@ class Net(nn.Module):
     Definición de la clase red neuronal
     """
 
-    def __init__(self, params): # EL CONSTRUCTOR, CUANDO CREAMOS UN NUEVO OBEJTO 
-        # DE LA CLASE SE LLAMA? DEFINE LAS CAPAS DE TU RED NEURONAL
+    def __init__(self, params):
+        """
+        Se define una red neuronal recurrente para la obtención de entidades
+        nombradas de un texto. Se compone de tres capas: capa lineal de embedding, 
+        capa LSTM y capa 'fully-connceted'.
+        """
 
         super(Net, self).__init__()
         # llama al constructor de la clase 'Params', se construye su clase y
@@ -37,33 +41,25 @@ class Net(nn.Module):
         # a la capa de embedding
 
 
-        # DE ABAJO LE LLEGA 
-        # PROYECTA .. A OTR ADIMENSION PARAMS.LSTM_HIDDEN_DIM
-
-        # SE PROYECTA A UNNUEVO PUNTO DEL ESPACIO
-        # EL DE ENTRADA, Y EL PROYECTADO (CONTEXTUAL) NO TIENEN PORQUE TENER EL
-        # MISMO TAMAÑO, OPR ESO SE PONE LAS DIMENSIONES
-
-        # capa LSTM que recibe como parámetros las dimensiones del embedding
-        # y el número de características del estado 'hidden'
-        # batch_first = True -> hace que los tensores de entrada y salida se den
-        # de forma batch,seq,feature
         self.lstm = nn.LSTM(params.embedding_dim,
                             params.lstm_hidden_dim, batch_first=True)
-
-
+        # capa LSTM que recibe como parámetros las dimensiones del embedding
+        # y las dimensiones del estado 'hidden' que no tienen porqué coincidir
+        # batch_first = True -> hace que los tensores de entrada y salida se den
+        # de forma batch,seq,feature
 
         # MATRIZ
-
-
         # PARAMS.NUMBER_OF_TAGS:
-        # TANTOS NUMEROS COMO ETIQUETAS TENGA, ME DICE LA PROB DE QUE LA PALABRA SEA UN NOMBRE, LUGAR, TIEMPO,.. O CASI?
+        # TANTOS NUMEROS COMO ETIQUETAS TENGA, 
         self.fc = nn.Linear(params.lstm_hidden_dim, params.number_of_tags)
+        # capa 'fully-connected', es la capa que da el output final, me dice la
+        # probabilidad de que la palabra sea una ner (named entitty recognition) tag
+        # de cierto tipo (nombre, tiempo, lugar...)
 
-        # CONLSUION: TENEOMS TRES CAPAS, EMBEDDING, LSTM Y FC
 
-
-    def forward(self, s): # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
+    def forward(self, s): 
+    # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS
+    # CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
     # HACIA DELANTEÇ??
 
         s = self.embedding(s)
@@ -79,8 +75,10 @@ class Net(nn.Module):
         return F.log_softmax(s, dim=1)
 
 
-def loss_fn(outputs, labels):
-
+def loss_fn(outputs, labels): 
+    """
+    método función de pérdida
+    """
     labels = labels.view(-1)
 
     mask = (labels >= 0).float()
