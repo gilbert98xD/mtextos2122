@@ -107,12 +107,12 @@ def accuracy(outputs, labels):
     Cálculo de la precisión a partir de las etiquetas y las salidas teniendo en cuenta los términos
     # de padding
     """
-
-    labels = labels.ravel()
+    labels = labels.ravel() # aplanamiento de la variable
 
     mask = (labels >= 0) # máscara similar al anterior método 'loss_fn'
 
-    outputs = np.argmax(outputs, axis=1) # índices con los mayores valores a lo largo del eje 1 (columnas)
+    outputs = np.argmax(outputs, axis=1) # índices con los mayores valores, es decir, 
+    # obtención de las clases más probables de cada token
 
     return np.sum(outputs == labels)/float(np.sum(mask)) # precisión/tasa de acierto
 
