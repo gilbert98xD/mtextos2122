@@ -90,25 +90,31 @@ def loss_fn(outputs, labels):
 
     mask = (labels >= 0).float() # para que coincidan los tamaños de las muestras se hace 'padding', que es
     # añadir ceros a las secuencias para la coincidencia. Estos token tienen -1 como etiqueta, por lo que
-    # con esta línea de código los excluimos del cálculo de la función de pérdida
+    # podemos usar una máscara que los excluya del cálculo de la función de pérdida
     # (ALMENOS YO LO HE ENTENDIDO ASÍ)
 
-    labels = labels % outputs.shape[1]
+    labels = labels % outputs.shape[1] # conversión de las etiquetas en positivas (por los padding tokens)
 
     num_tokens = int(torch.sum(mask))
 
     return -torch.sum(outputs[range(outputs.shape[0]), labels]*mask)/num_tokens
+    # se devuelve la entropía cruzada de todos los tokens, menos los de padding, mediante el uso
+    # de la variable 'mask' que hace de máscara, la cual hemos definido antes
 
 
 def accuracy(outputs, labels):
+    """
+    Cálculo de la precisión a partir de las etiquetas y las salidas teniendo en cuenta los términos
+    # de padding
+    """
 
     labels = labels.ravel()
 
-    mask = (labels >= 0)
+    mask = (labels >= 0) # máscara similar al anterior método 'loss_fn'
 
-    outputs = np.argmax(outputs, axis=1)
+    outputs = np.argmax(outputs, axis=1) # índices con los mayores valores a lo largo del eje 1 (columnas)
 
-    return np.sum(outputs == labels)/float(np.sum(mask))
+    return np.sum(outputs == labels)/float(np.sum(mask)) # precisión/tasa de acierto
 
 
 metrics = {
