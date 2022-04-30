@@ -33,31 +33,35 @@ parser.add_argument('--restore_file', default='best', help="name of the file in 
 
 def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
     """
-
+    FUNCIONALIDADES????
     """
     
+    # evaluación del modelo
     model.eval()
 
-    
     summ = []
-
     
     for _ in range(num_steps):
     
         data_batch, labels_batch = next(data_iterator) # obtenemos los datos y las etiquetas de cada batch
-        # data_iterator nos da un generador con el cual podemos iterar 
-   
+        # data_iterator nos da un generador 
+
+        # obtención de los ouputs
         output_batch = model(data_batch)
-        loss = loss_fn(output_batch, labels_batch)
-    
+        loss = loss_fn(output_batch, labels_batch) # función de périda en este batch
+
+        # se obtienen los datos outputs de las variables de antes, los copiamos en la cpu y 
+        # los convertimos en arrays 
         output_batch = output_batch.data.cpu().numpy()
         labels_batch = labels_batch.data.cpu().numpy()
 
+        # resumen 
         summary_batch = {metric: metrics[metric](output_batch, labels_batch)
                          for metric in metrics}
         summary_batch['loss'] = loss.item()
         summ.append(summary_batch)
 
+    # media de las métricas obtenidas
     metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
     metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
     logging.info("- Eval metrics : " + metrics_string)
