@@ -20,39 +20,34 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# AQUI DEFINIMOS UNA RED NEURONAL
-
-##NN.MODULE ES U MODELO NEURONAL BASICO, LUEGO PUEDO PARTICULARIZAR O HEREDAR DE EL
-## NN.MODULE ES UNA CLASE BASE?
-
 class Net(nn.Module):
     """
-    Definición de la clase 'red neuronal'
+    Definición de la clase red neuronal
     """
 
-    def __init__(self, params): # EL CONSTRUCTOR, CUANDO CREAMOS UN NUEVO OBEJTO DE LA CLASE SE LLAMA?
-    # DEFINE LAS CAPAS DE TU RED NEURONAL
+    def __init__(self, params): # EL CONSTRUCTOR, CUANDO CREAMOS UN NUEVO OBEJTO 
+        # DE LA CLASE SE LLAMA? DEFINE LAS CAPAS DE TU RED NEURONAL
 
-        super(Net, self).__init__() # LLAMA AL CONSTRUCTOR DEL PADRE
-        # SE LE PIDE AL PDRE QUE CONSTRUYA SU CLASE Y LUEGO YA EL RESTO DE ESTA CLASE
-
-        # COMPONENTES QUE TNEDRÁ LA RED NUERONAL, 
-        # MATRIZ DE EMBEDDINGS
-
-        # SE LE DA EL TAMAÑO, EL TAMAÑO DEL VOCABULARIO, PARAMS.VOCAB_SIZE
-        # LAS DIMENSIONES LAS DECIDO YO, 
+        super(Net, self).__init__()
+        # llama al constructor de la clase 'Params', se construye su clase y
+        # a continuación la clase hija 'Net'
 
         self.embedding = nn.Embedding(params.vocab_size, params.embedding_dim)
-        #
+        # se le da el tamaño del vocabulario y las dimensiones del embedding
+        # a la capa de embedding
 
 
         # DE ABAJO LE LLEGA 
         # PROYECTA .. A OTR ADIMENSION PARAMS.LSTM_HIDDEN_DIM
 
         # SE PROYECTA A UNNUEVO PUNTO DEL ESPACIO
-        # EL DE ENTRADA, Y EL PROYECTADO (CONTEXTUAL) NO TIENEN PORQUE TENER EL MISMO TAMAÑO, 
-        # OPR ESO SE PONE LAS DIMENSIONES
+        # EL DE ENTRADA, Y EL PROYECTADO (CONTEXTUAL) NO TIENEN PORQUE TENER EL
+        # MISMO TAMAÑO, OPR ESO SE PONE LAS DIMENSIONES
 
+        # capa LSTM que recibe como parámetros las dimensiones del embedding
+        # y el número de características del estado 'hidden'
+        # batch_first = True -> hace que los tensores de entrada y salida se den
+        # de forma batch,seq,feature
         self.lstm = nn.LSTM(params.embedding_dim,
                             params.lstm_hidden_dim, batch_first=True)
 
@@ -66,6 +61,7 @@ class Net(nn.Module):
         self.fc = nn.Linear(params.lstm_hidden_dim, params.number_of_tags)
 
         # CONLSUION: TENEOMS TRES CAPAS, EMBEDDING, LSTM Y FC
+
 
     def forward(self, s): # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
     # HACIA DELANTEÇ??
