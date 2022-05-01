@@ -57,10 +57,6 @@ class Net(nn.Module):
                             params.lstm_hidden_dim, batch_first=True)
 
 
-        # MATRIZ
-        # PARAMS.NUMBER_OF_TAGS:
-        # TANTOS NUMEROS COMO ETIQUETAS TENGA, 
-
         """
         Capa 'fully-connected', es la capa que da el output final, me dice la 
         probabilidad de que la palabra sea una ner (named entitty recognition) tag
@@ -69,10 +65,9 @@ class Net(nn.Module):
         self.fc = nn.Linear(params.lstm_hidden_dim, params.number_of_tags)
 
         """
-        CONCLUSIÓN: Tenemos tres capas: la primera dada una palabra me da su embedding,
-        la segunda ese embedding se lleva a otros espacio de embeddings que no tiene porque tener la misma dimension,
-        y la tercera capa se lleva este nuevo embedding a otro espacio, que en este caso es el numero de etqieuta,
-        probablidad de cada una de...?
+        En resumen la primera capa, dada una palabra, me da su embedding, en la segunda ese embedding 
+        se lleva a otros espacio de embeddings que no tiene porque tener la misma dimension, y la tercera
+        capa se lleva este nuevo embedding a otro espacio, el número de etiqueta
         """
 
 
@@ -80,12 +75,8 @@ class Net(nn.Module):
    
     def forward(self, s): 
         """
-        Funcionalidad??
+        Función que, a partir de un batch input, obtiene las probablidades logits de los tokens
         """
-    # METODO QUE SE INVOCA CUANDO, COMO SE VA PROCESANOD LA INFO EN UNA D ESAS
-    # CAPAS CUANDO ESTOY USANDO LA RED NEURNOAL
-    # HACIA DELANTEÇ??
-        # variable input s, con dimensiones x
 
         """
         aplicamos una capa de embedding
@@ -94,7 +85,7 @@ class Net(nn.Module):
         s = self.embedding(s) 
 
         """
-        Aplicación de una LSTM
+        Aplicación de la LSTM
         """
         s, _ = self.lstm(s) 
 
@@ -104,35 +95,57 @@ class Net(nn.Module):
         s = s.contiguous() 
 
         """
-        Cambiamos la forma de la variable s de tal manera que cada fila tiene un token
+        Cambiamos la forma de la variable s (es una matriz) de tal manera que cada fila tiene un token.
+        Con el -1 le indicamos que calcule la dimensión automáticamente para obtener dos dimensiones. Y el
+        s.shape[2] es lstm_hidden_dim. Se le pone el [2] porque el [0] es el tamaño de batch y el [1] es
+        el máximo de la secuencia
         """
-        s = s.view(-1, s.shape[2]) # cambiamos la forma de la variable s de tal manera que
-        # cada fila tiene un token
+        s = s.view(-1, s.shape[2]) 
 
-        s = self.fc(s) # aplicación de capa 'fully-connected'
+        """
+        Última capa 'fully-connected'proyecta el nuevo embedding hacia un espacio con el número de etqiuetas
+        """
+        s = self.fc(s) 
 
-        return F.log_softmax(s, dim=1) # aplicamos una softmax seguida del logarimto log(softmax(argument)) 
-        # en la dimensión indicada
-
+        """
+        No obstante, aun no tenemos probabilidades hay que aplicar una softmax. Por una mayor
+        eficiencia se aplica un log(softmax) por lo que las probabilidades de 0 a 1 pasan a ser
+        negativas. Cuanto más cerca estemos del cero más alta es la probabilidad.
+        """
+        return F.log_softmax(s, dim=1)
+ 
 
 def loss_fn(outputs, labels): 
     """
     método función de pérdida
     """
-    labels = labels.view(-1) # aplana la variable
 
-    mask = (labels >= 0).float() # para que coincidan los tamaños de las muestras se hace 'padding', que es
-    # añadir ceros a las secuencias para la coincidencia. Estos token tienen -1 como etiqueta, por lo que
-    # podemos usar una máscara que los excluya del cálculo de la función de pérdida
-    # (ALMENOS YO LO HE ENTENDIDO ASÍ)
 
-    labels = labels % outputs.shape[1] # conversión de las etiquetas en positivas (por los padding tokens)
+    """
+    aplana la variable
+    """
+    labels = labels.view(-1) 
+
+    """
+    Los inputs de una red neuronal deben tener la misma forma y tamaño, para que esto sea así al pasar oraciones
+    se hace 'padding', que añade ceros a las secuencias o corta oraciones largas. Estos token tienen -1 como etiqueta, 
+    por lo que podemos usar una máscara que los excluya del cálculo de la función de pérdida.
+    """
+    mask = (labels >= 0).float() 
+
+    """
+    Conversión de las etiquetas en positivas (por los padding tokens)
+    """
+    labels = labels % outputs.shape[1] 
 
     num_tokens = int(torch.sum(mask))
 
     return -torch.sum(outputs[range(outputs.shape[0]), labels]*mask)/num_tokens
-    # se devuelve la entropía cruzada de todos los tokens, menos los de padding, mediante el uso
-    # de la variable 'mask' que hace de máscara, la cual hemos definido antes
+    """
+    Se devuelve la entropía cruzada de todos los tokens, menos los de padding, mediante el uso
+    de la variable 'mask' que hace de máscara, la cual hemos definido antes
+    """
+
 
 
 def accuracy(outputs, labels):
@@ -140,14 +153,23 @@ def accuracy(outputs, labels):
     Cálculo de la precisión a partir de las etiquetas y las salidas teniendo en cuenta los términos
     # de padding
     """
-    labels = labels.ravel() # aplanamiento de la variable
 
-    mask = (labels >= 0) # máscara similar al anterior método 'loss_fn'
+    """
+    Aplanamiento de la variable
+    """
+    labels = labels.ravel() 
 
-    outputs = np.argmax(outputs, axis=1) # índices con los mayores valores, es decir, 
-    # obtención de las clases más probables de cada token
+    """
+    Máscara similar al anterior método 'loss_fn'
+    """
+    mask = (labels >= 0) 
 
-    return np.sum(outputs == labels)/float(np.sum(mask)) # precisión/tasa de acierto
+    """
+    Índices con los mayores valores, es decir, obtención de las clases más probables de cada token
+    """
+    outputs = np.argmax(outputs, axis=1) 
+
+    return np.sum(outputs == labels)/float(np.sum(mask)) """ precisión/tasa de acierto"""
 
 
 metrics = {
