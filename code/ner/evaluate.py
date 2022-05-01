@@ -23,6 +23,9 @@ import utils
 import model.net as net
 from model.data_loader import DataLoader
 
+$ pip install pycco
+$ pycco 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', default='data/small', help="Directory containing the dataset")
 parser.add_argument('--model_dir', default='experiments/base_model', help="Directory containing params.json")

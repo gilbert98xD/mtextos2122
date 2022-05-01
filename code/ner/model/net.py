@@ -10,7 +10,7 @@ de la Universidad de Stanford.
 **Autores de los comentarios:** Gilbert Lurduy & Enrique Moreno
 
 Este módulo define la red neuronal, la función de pérdida y la métrica de aciertos
-para la evaluación del modelo. Se hace uso de la libería torch
+para la evaluación del modelo. Se hace uso de la libería torch.
 """
 
 
@@ -32,31 +32,52 @@ class Net(nn.Module):
         capa LSTM y capa 'fully-connceted'.
         """
 
-        super(Net, self).__init__()
-        # llama al constructor de la clase 'Params', se construye su clase y
-        # a continuación la clase hija 'Net'
 
+        """
+        Llama al constructor de la clase 'Params', se construye su clase y  a 
+        continuación la clase hija 'Net'
+        """
+        super(Net, self).__init__() 
+
+
+        """
+        Se le da el tamaño del vocabulario y las dimensiones del embedding 
+        a la capa de embedding
+        """
         self.embedding = nn.Embedding(params.vocab_size, params.embedding_dim)
-        # se le da el tamaño del vocabulario y las dimensiones del embedding
-        # a la capa de embedding
 
 
+        """
+        Capa LSTM que recibe como parámetros las dimensiones del embedding
+        y las dimensiones del estado 'hidden' que no tienen porqué coincidir
+        batch_first = True -> hace que los tensores de entrada y salida se den
+        de forma batch,seq,feature
+        """
         self.lstm = nn.LSTM(params.embedding_dim,
                             params.lstm_hidden_dim, batch_first=True)
-        # capa LSTM que recibe como parámetros las dimensiones del embedding
-        # y las dimensiones del estado 'hidden' que no tienen porqué coincidir
-        # batch_first = True -> hace que los tensores de entrada y salida se den
-        # de forma batch,seq,feature
+
 
         # MATRIZ
         # PARAMS.NUMBER_OF_TAGS:
         # TANTOS NUMEROS COMO ETIQUETAS TENGA, 
+
+        """
+        Capa 'fully-connected', es la capa que da el output final, me dice la 
+        probabilidad de que la palabra sea una ner (named entitty recognition) tag
+        de cierto tipo (nombre, tiempo, lugar...)
+        """
         self.fc = nn.Linear(params.lstm_hidden_dim, params.number_of_tags)
-        # capa 'fully-connected', es la capa que da el output final, me dice la
-        # probabilidad de que la palabra sea una ner (named entitty recognition) tag
-        # de cierto tipo (nombre, tiempo, lugar...)
+
+        """
+        CONCLUSIÓN: Tenemos tres capas: la primera dada una palabra me da su embedding,
+        la segunda ese embedding se lleva a otros espacio de embeddings que no tiene porque tener la misma dimension,
+        y la tercera capa se lleva este nuevo embedding a otro espacio, que en este caso es el numero de etqieuta,
+        probablidad de cada una de...?
+        """
 
 
+
+   
     def forward(self, s): 
         """
         Funcionalidad??
@@ -66,13 +87,25 @@ class Net(nn.Module):
     # HACIA DELANTEÇ??
         # variable input s, con dimensiones x
 
-        s = self.embedding(s) # aplicamos una capa de embedding
-        # las dimensiones resultantes son(x,dimension de los embeddings)
+        """
+        aplicamos una capa de embedding
+        las dimensiones resultantes son(x,dimension de los embeddings)
+        """
+        s = self.embedding(s) 
 
-        s, _ = self.lstm(s) # aplicación de una LSTM
+        """
+        Aplicación de una LSTM
+        """
+        s, _ = self.lstm(s) 
 
-        s = s.contiguous() # se hace una copia del tensor en memoria
+        """
+        Se hace una copia del tensor en memoria
+        """
+        s = s.contiguous() 
 
+        """
+        Cambiamos la forma de la variable s de tal manera que cada fila tiene un token
+        """
         s = s.view(-1, s.shape[2]) # cambiamos la forma de la variable s de tal manera que
         # cada fila tiene un token
 
