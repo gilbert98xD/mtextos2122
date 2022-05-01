@@ -54,10 +54,9 @@ def save_dict_to_json(d, json_path):
     * `json_path`: ruta del JSON a donde es convertido el diccionario
     """
     with open(json_path, 'w') as f:
+        # La variable `d` es un diccionario compuesto por las parejas formadas por k (key) y v (value) provenientes del diccionario `d` (parámetro de entrada)
         d = {k: v for k, v in d.items()}
-        """
-        La variable `d` es un diccionario compuesto por las parejas formadas por k (key) y v (value) provenientes del diccionario `d` (parámetro de entrada)
-        """
+        
         json.dump(d, f, indent=4)
 
 
@@ -89,7 +88,7 @@ if __name__ == '__main__':
     print("Building word vocabulary...")
     # Counter de palabras para contar la frecuencia de las palabras
     words = Counter()
-    # Se calculan los tamaños de los datasets de frases de entrenamiento, validación y test, a la par que se actualiza el Counter de palabras
+    # Calcular los tamaños de los datasets de frases de entrenamiento, validación y test, a la par que se actualiza el Counter de palabras
     size_train_sentences = update_vocab(os.path.join(args.data_dir, 'train/sentences.txt'), words)
     size_dev_sentences = update_vocab(os.path.join(args.data_dir, 'val/sentences.txt'), words)
     size_test_sentences = update_vocab(os.path.join(args.data_dir, 'test/sentences.txt'), words)
@@ -98,18 +97,18 @@ if __name__ == '__main__':
     print("Building tag vocabulary...")
     # Counter de etiquetas para contar la frecuencia de las etiquetas
     tags = Counter()
-    # Se calculan los tamaños de los datasets de labels de entrenamiento, validación y test, a la par que se actualiza el Counter de etiquetas
+    # Calcular los tamaños de los datasets de labels de entrenamiento, validación y test, a la par que se actualiza el Counter de etiquetas
     size_train_tags = update_vocab(os.path.join(args.data_dir, 'train/labels.txt'), tags)
     size_dev_tags = update_vocab(os.path.join(args.data_dir, 'val/labels.txt'), tags)
     size_test_tags = update_vocab(os.path.join(args.data_dir, 'test/labels.txt'), tags)
     print("- done.")
     
-    # Se comprueba que la cantidad de tokens y etiquetas en cada dataset sean iguales
+    # Comprobar que la cantidad de tokens y etiquetas en cada dataset sean iguales
     assert size_train_sentences == size_train_tags
     assert size_dev_sentences == size_dev_tags
     assert size_test_sentences == size_test_tags
     
-    # Se mantienen aquellas palabras y etiquetas de mayor o igual frecuencia que lo establecido en los argumentos del programa
+    # Mantener aquellas palabras y etiquetas de mayor o igual frecuencia que lo establecido en los argumentos del programa
     words = [tok for tok, count in words.items() if count >= args.min_count_word]
     tags = [tok for tok, count in tags.items() if count >= args.min_count_tag]
     
@@ -137,6 +136,7 @@ if __name__ == '__main__':
         'pad_tag': PAD_TAG,
         'unk_word': UNK_WORD
     }
+
     save_dict_to_json(sizes, os.path.join(args.data_dir, 'dataset_params.json'))
     
     # Imprimir características del dataset
