@@ -36,7 +36,7 @@ class DataLoader(object):
 
         #### Parámetros:
         * `data_dir`: directorio donde se encuentra el dataset
-        * `params`: parámetros del entrenamiento
+        * `params`: parámetros de entrenamiento
         """
 
         # Cargar los parámetros del dataset
@@ -155,7 +155,7 @@ class DataLoader(object):
 
         #### Parámetros:
         * `data`: diccionario conteniendo las frases, etiquetas y la cantidad de frases según la partición de datos
-        * `params`: parámetros del entrenamiento
+        * `params`: parámetros de entrenamiento
         * `shuffle`: booleano que determina si se mezclan los datos
 
         #### Genera:
