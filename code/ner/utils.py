@@ -28,25 +28,38 @@ class Params():
     """
 
     def __init__(self, json_path):
+        """
+        Carga del fichero json_path del cual se obtiene un objeto json y actualización
+         del diccionario built-in de atributos del objeto
+        """
         with open(json_path) as f:
-            params = json.load(f) # carga del fichero json_path del se obtiene un objeto json
-            self.__dict__.update(params) # actualización del diccionario built-in de atributos del objeto
+            params = json.load(f) 
+            self.__dict__.update(params) 
             
 
     def save(self, json_path):
+        """
+        Escribe/guarda el diccionario actualizado en el archhivo json_path
+        con una identación de 4 espacios
+        """
         with open(json_path, 'w') as f:
             json.dump(self.__dict__, f, indent=4)
-            # escribe/guarda el diccionario actualizado en el archhivo json_path
-            # con una identación de 4 espacios
+            
 
-    def update(self, json_path): # método que hace la misma función que el constructor
+    def update(self, json_path): 
+        """
+        Método que hace la misma función que el constructor
+        """
         with open(json_path) as f:
             params = json.load(f)
             self.__dict__.update(params)
 
-    @property # decorador
+    @property """ Decorador """
     def dict(self): 
-        return self.__dict__ # nos devuelve el diccionario de atributos del objeto creado con esta clase
+        """
+        Nos devuelve el diccionario de atributos del objeto creado con esta clase
+        """
+        return self.__dict__ 
 
 
 
@@ -55,16 +68,25 @@ class RunningAverage():
     Obtención de la cantidad 'running average' de cualquier variable
     """
 
-    def __init__(self): # el constructor inicializa los pasos
+    def __init__(self): 
+        """
+        El constructor inicializa los pasos
+        """
         self.steps = 0 
         self.total = 0
 
     def update(self, val): 
-        self.total += val # actualizaciones del valor total y de los pasos
+        """
+        Actualizaciones del valor total y de los pasos
+        """
+        self.total += val 
         self.steps += 1
 
     def __call__(self):
-        return self.total / float(self.steps) # obtención de la media de los valores final
+        """
+        Obtención de la media de los valores final
+        """
+        return self.total / float(self.steps) 
 
 
 
@@ -74,23 +96,29 @@ def set_logger(log_path):
     Establece dos loggers para enviar la información a un fichero y a consola
     """
 
-    logger = logging.getLogger() # se crea un objeto logger
-    logger.setLevel(logging.INFO) # se establece el nivel del logger. Se guardaran los logs
+    """
+    Se crea un objeto logger y se establece el nivel del logger. Se guardaran los logs
     # de tipo INFO o superior (debug,notset)
+    """
+    logger = logging.getLogger() 
+    logger.setLevel(logging.INFO)
 
-    if not logger.handlers: # si no hay un handler se creará uno; éste
-    # especifica a qué tipo de archivo se envía el registro (log)
-
-        file_handler = logging.FileHandler(log_path) # handler que guarda el registro
-        # en archivos del disco
+    """
+    Si no hay un handler se creará uno; éste especifica a qué tipo de archivo se envía el registro (log)
+    """
+    if not logger.handlers: 
+        
+        """
+        Handler que guarda el registro en archivos del disco
+        """
+        file_handler = logging.FileHandler(log_path) 
         file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
         logger.addHandler(file_handler)
 
-        stream_handler = logging.StreamHandler() # guarda el registro en consola
-        stream_handler.setFormatter(logging.Formatter('%(message)s'))
-        # la línea de código inmediatamente superior sólo especifica el formato
-        # del log 
-        logger.addHandler(stream_handler) # adición del stream handler al logger
+        stream_handler = logging.StreamHandler() """ guarda el registro en consola"""
+        stream_handler.setFormatter(logging.Formatter('%(message)s')) """sólo especifica el formato del log"""
+        
+        logger.addHandler(stream_handler) """ adición del stream handler al logger"""
 
 
 def save_dict_to_json(d, json_path):
@@ -99,8 +127,8 @@ def save_dict_to_json(d, json_path):
     """
  
     with open(json_path, 'w') as f:
-        d = {k: float(v) for k, v in d.items()} # conversión a floats de los items de d
-        json.dump(d, f, indent=4) # se guarda d en f (json_path)
+        d = {k: float(v) for k, v in d.items()} """ conversión a floats de los items de d """
+        json.dump(d, f, indent=4) """ se guarda d en f (json_path) """
 
 
 
@@ -115,16 +143,29 @@ def save_checkpoint(state, is_best, checkpoint):
     """
 
     filepath = os.path.join(checkpoint, 'last.pth.tar')
-    if not os.path.exists(checkpoint): # si no existe el directorio checkpoint, entonces lo crea
+
+    """
+    Si no existe el directorio checkpoint, entonces lo crea
+    """
+    if not os.path.exists(checkpoint): 
         print("Checkpoint Directory does not exist! Making directory {}".format(checkpoint))
-        os.mkdir(checkpoint) # creación del directorio
+        """
+        Creación del directorio
+        """
+        os.mkdir(checkpoint) 
     else:
         print("Checkpoint Directory exists! ")
-    torch.save(state, filepath) # guarda las características del modelo en 'filepath'
+
+    """
+    guarda las características del modelo en 'filepath'
+    """
+    torch.save(state, filepath) 
+
     if is_best:
         shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.tar')) 
-        # en el caso de que el modelo sea el mejor, se copia su
-        #  checkpoint grabado de filepath en 'best.pth.tar'
+        """
+        En el caso de que el modelo sea el mejor, se copia su checkpoint grabado de filepath en 'best.pth.tar'
+        """
 
 
 
@@ -134,13 +175,23 @@ def load_checkpoint(checkpoint, model, optimizer=None):
    """
     if not os.path.exists(checkpoint):
         raise ("File doesn't exist {}".format(checkpoint))
-    checkpoint = torch.load(checkpoint) # carga del checkpoint (en un diccionario)
-    model.load_state_dict(checkpoint['state_dict']) # cargamos el estado del modelo con 
-    # la llave 'state_dict', la cual contiene los pesos de la red neuronal
+    
+    """
+    Carga del checkpoint (en un diccionario)
+    """
+    checkpoint = torch.load(checkpoint) 
+
+    """
+    Cargamos el estado del modelo con la llave 'state_dict', la cual contiene los pesos de la red neuronal
+    """
+    model.load_state_dict(checkpoint['state_dict']) 
 
     if optimizer: 
+        """
+        En el caso de que haya optimizador se carga también mediante la llave 'optim_dict'
+        """
         optimizer.load_state_dict(checkpoint['optim_dict']) 
-        # # en el caso de que haya optimizador se carga también mediante la llave 'optim_dict'
+        
 
     return checkpoint
     
