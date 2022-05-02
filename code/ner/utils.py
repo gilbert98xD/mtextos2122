@@ -3,195 +3,162 @@
 Universidad de Alicante, curso 2021-2022
 
 Esta documentación forma parte de la práctica "[Lectura y documentación de un sistema de
-extracción de entidades](https://jaspock.github.io/mtextos/bloque2_practica.html)" y se 
+extracción de entidades](https://jaspock.github.io/mtextos2122/bloque2_practica.html)" y se 
 basa en el código del curso [CS230](https://github.com/cs230-stanford/cs230-code-examples) 
 de la Universidad de Stanford.
 
 **Autores de los comentarios:** Gilbert Lurduy & Enrique Moreno
 
-Este módulo define dos clases: 'Params' y 'Runnin Average'. Se define una función para establecer 
-los registros y dos funciones relacionadas con guardar y cargar los 'checkpoints' de los modelos. 
+Este módulo contiene una función para la evaluación de la red neuronal y el main del programa
+para obtener la tasa de acierto en el conjunto de test para el modelo.
 """
 
 
-import json
+import argparse
 import logging
 import os
-import shutil
 
+import numpy as np
 import torch
+import utils
+import model.net as net
+from model.data_loader import DataLoader
 
 
-class Params():
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--data_dir', default='data/small', help="Directory containing the dataset")
+parser.add_argument('--model_dir', default='experiments/base_model', help="Directory containing params.json")
+parser.add_argument('--restore_file', default='best', help="name of the file in --model_dir \
+                     containing weights to load")
+
+
+
+def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
     """
-    Carga los parámetros contenidos en un archivo tipo json
+    Método que evalua el modelo con 'num_steps' batches
     """
+    
+    
+    
+    
+    """Evaluación del modelo"""
+    model.eval()
 
-    def __init__(self, json_path):
-        """
-        Carga del fichero json_path del cual se obtiene un objeto json y actualización
-         del diccionario built-in de atributos del objeto
-        """
-        with open(json_path) as f:
-            params = json.load(f) 
-            self.__dict__.update(params) 
-            
-
-    def save(self, json_path):
-        """
-        Escribe/guarda el diccionario actualizado en el archhivo json_path
-        con una identación de 4 espacios
-        """
-        with open(json_path, 'w') as f:
-            json.dump(self.__dict__, f, indent=4)
-            
-
-    def update(self, json_path): 
-        """
-        Método que hace la misma función que el constructor
-        """
-        with open(json_path) as f:
-            params = json.load(f)
-            self.__dict__.update(params)
-
-    @property """ Decorador """
-    def dict(self): 
-        """
-        Nos devuelve el diccionario de atributos del objeto creado con esta clase
-        """
-        return self.__dict__ 
-
-
-
-class RunningAverage():
-    """
-    Obtención de la cantidad 'running average' de cualquier variable
-    """
-
-    def __init__(self): 
-        """
-        El constructor inicializa los pasos
-        """
-        self.steps = 0 
-        self.total = 0
-
-    def update(self, val): 
-        """
-        Actualizaciones del valor total y de los pasos
-        """
-        self.total += val 
-        self.steps += 1
-
-    def __call__(self):
-        """
-        Obtención de la media de los valores final
-        """
-        return self.total / float(self.steps) 
-
-
-
-
-def set_logger(log_path):
-    """
-    Establece dos loggers para enviar la información a un fichero y a consola
-    """
-
-    """
-    Se crea un objeto logger y se establece el nivel del logger. Se guardaran los logs
-    # de tipo INFO o superior (debug,notset)
-    """
-    logger = logging.getLogger() 
-    logger.setLevel(logging.INFO)
-
-    """
-    Si no hay un handler se creará uno; éste especifica a qué tipo de archivo se envía el registro (log)
-    """
-    if not logger.handlers: 
+    summ = []
+    
+    for _ in range(num_steps):
         
         """
-        Handler que guarda el registro en archivos del disco
+        Obtenemos los datos y las etiquetas de cada batch; data_iterator nos da un generador
         """
-        file_handler = logging.FileHandler(log_path) 
-        file_handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
-        logger.addHandler(file_handler)
+        data_batch, labels_batch = next(data_iterator)  
 
-        stream_handler = logging.StreamHandler() """ guarda el registro en consola"""
-        stream_handler.setFormatter(logging.Formatter('%(message)s')) """sólo especifica el formato del log"""
-        
-        logger.addHandler(stream_handler) """ adición del stream handler al logger"""
-
-
-def save_dict_to_json(d, json_path):
-    """
-    Se guarda el diccionario d en formato json y sus valores se pasan a floats
-    """
- 
-    with open(json_path, 'w') as f:
-        d = {k: float(v) for k, v in d.items()} """ conversión a floats de los items de d """
-        json.dump(d, f, indent=4) """ se guarda d en f (json_path) """
-
-
-
-
-def save_checkpoint(state, is_best, checkpoint):
-    """
-    Guarda los 'checkpoints' (fichero con todos los parámetros del modelo pytorch)
-
-    - state: diccionario del modelo
-    - is_best:  booleano que determina si el modelo es el mejor que se ha obtenido hasta entonces
-    - checkpoint: string indicando dónde guardar
-    """
-
-    filepath = os.path.join(checkpoint, 'last.pth.tar')
-
-    """
-    Si no existe el directorio checkpoint, entonces lo crea
-    """
-    if not os.path.exists(checkpoint): 
-        print("Checkpoint Directory does not exist! Making directory {}".format(checkpoint))
         """
-        Creación del directorio
+        Obtención de los ouputs
         """
-        os.mkdir(checkpoint) 
-    else:
-        print("Checkpoint Directory exists! ")
+        output_batch = model(data_batch)
+
+        """
+        Función de périda en este batch
+        """
+        loss = loss_fn(output_batch, labels_batch) 
+
+        """
+        Se obtienen los datos outputs de las variables de antes, los copiamos en la cpu y los convertimos en arrays 
+        """
+        output_batch = output_batch.data.cpu().numpy()
+        labels_batch = labels_batch.data.cpu().numpy()
+
+        """Resumen""" 
+        summary_batch = {metric: metrics[metric](output_batch, labels_batch)
+                         for metric in metrics}
+        summary_batch['loss'] = loss.item()
+        summ.append(summary_batch)
+
+    """Media de las métricas obtenidas en la variable resumen 'summ' """
+    metrics_mean = {metric:np.mean([x[metric] for x in summ]) for metric in summ[0]} 
+    metrics_string = " ; ".join("{}: {:05.3f}".format(k, v) for k, v in metrics_mean.items())
+    logging.info("- Eval metrics : " + metrics_string)
+    return metrics_mean 
+
+
+if __name__ == '__main__':
+
+    args = parser.parse_args()
+    """
+    Establecimiento del camino (path)
+    """
+    json_path = os.path.join(args.model_dir, 'params.json')
 
     """
-    guarda las características del modelo en 'filepath'
+    Con la 'keyword' assert nos asegurames de que el archivo este en el path indicado, si no 
+    saltará un error tipo AssertionError
     """
-    torch.save(state, filepath) 
-
-    if is_best:
-        shutil.copyfile(filepath, os.path.join(checkpoint, 'best.pth.tar')) 
-        """
-        En el caso de que el modelo sea el mejor, se copia su checkpoint grabado de filepath en 'best.pth.tar'
-        """
-
-
-
-def load_checkpoint(checkpoint, model, optimizer=None):
-   """
-   Carga del fichero checkpoint con la información del modelo
-   """
-    if not os.path.exists(checkpoint):
-        raise ("File doesn't exist {}".format(checkpoint))
+    assert os.path.isfile(json_path), "No json configuration file found at {}".format(json_path)
     
     """
-    Carga del checkpoint (en un diccionario)
+    Cargamos los parámetros con ayuda de la clase Params que definimos en el archivo utils.py
     """
-    checkpoint = torch.load(checkpoint) 
+    params = utils.Params(json_path)
 
     """
-    Cargamos el estado del modelo con la llave 'state_dict', la cual contiene los pesos de la red neuronal
+    Con este le pedimos que mejor el rendimiento mediante la GPU si es posible 
     """
-    model.load_state_dict(checkpoint['state_dict']) 
+    params.cuda = torch.cuda.is_available()     
 
-    if optimizer: 
-        """
-        En el caso de que haya optimizador se carga también mediante la llave 'optim_dict'
-        """
-        optimizer.load_state_dict(checkpoint['optim_dict']) 
+    """ Semilla para replicar el experimento con los mismos resultados"""
+    torch.manual_seed(230) 
+    if params.cuda: torch.cuda.manual_seed(230)
         
+    """
+    Llamamos a la función que establece los registros
+    """
+    utils.set_logger(os.path.join(args.model_dir, 'evaluate.log')) 
 
-    return checkpoint
+    """
+    Registro de nivel info que nos indica que se está creando el dataset
+    """
+    logging.info("Creating the dataset...")
+
+    """
+    Carga de los datos de test
+    """
+    data_loader = DataLoader(args.data_dir, params)
+    data = data_loader.load_data(['test'], args.data_dir)
+    test_data = data['test']
+
+    params.test_size = test_data['size']
+    test_data_iterator = data_loader.data_iterator(test_data, params)
+
+    logging.info("- done.")
+
+    """
+    Creamos el modelo con la clase Net
+    """
+    model = net.Net(params).cuda() if params.cuda else net.Net(params)
     
+    """
+    Variables definidas de función de pérdida y métrica de tasa de acierto
+    """
+    loss_fn = net.loss_fn
+    metrics = net.metrics
+    
+    """
+    Se indica en el registro que la evaluación comienza
+    """
+    logging.info("Starting evaluation")
+
+    """
+    Cargamos los pesos del archivo con la información del modelo guardada
+    """
+    utils.load_checkpoint(os.path.join(args.model_dir, args.restore_file + '.pth.tar'), model)
+
+    """
+    Evaluación: se indica el número de pasos, se usa el método de evaluación 'evaluate', guardamos
+    la tasa de acierto en el conjunto de test en un diccionario en el path 'save_path'
+    """
+    num_steps = (params.test_size + 1) // params.batch_size
+    test_metrics = evaluate(model, loss_fn, test_data_iterator, metrics, params, num_steps)
+    save_path = os.path.join(args.model_dir, "metrics_test_{}.json".format(args.restore_file))
+    utils.save_dict_to_json(test_metrics, save_path)
