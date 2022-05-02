@@ -189,38 +189,47 @@ def train_and_evaluate(model, train_data, val_data, optimizer, loss_fn, metrics,
 
 if __name__ == '__main__':
 
+    # Cargar los parámetros
     args = parser.parse_args()
     json_path = os.path.join(args.model_dir, 'params.json')
     assert os.path.isfile(
         json_path), "No json configuration file found at {}".format(json_path)
     params = utils.Params(json_path)
 
+    # Usar GPU si hay disponibilidad
     params.cuda = torch.cuda.is_available()
 
+    # Establecer semilla para poder reproducir experimentos
     torch.manual_seed(230)
     if params.cuda:
         torch.cuda.manual_seed(230)
 
+    # Preparar el logger
     utils.set_logger(os.path.join(args.model_dir, 'train.log'))
 
     logging.info("Loading the datasets...")
 
+    # Cargar los datos de entrenamiento y validación
     data_loader = DataLoader(args.data_dir, params)
     data = data_loader.load_data(['train', 'val'], args.data_dir)
     train_data = data['train']
     val_data = data['val']
 
+    # Tamaño de los conjuntos de datos
     params.train_size = train_data['size']
     params.val_size = val_data['size']
 
     logging.info("- done.")
 
+    # Usar el modelo en la GPU si está disponible
     model = net.Net(params).cuda() if params.cuda else net.Net(params)
     optimizer = optim.Adam(model.parameters(), lr=params.learning_rate)
 
+    # Obtener función de perdida y medidas
     loss_fn = net.loss_fn
     metrics = net.metrics
 
+    # Entrenar el modelo
     logging.info("Starting training for {} epoch(s)".format(params.num_epochs))
     train_and_evaluate(model, train_data, val_data, optimizer, loss_fn, metrics, params, args.model_dir,
                        args.restore_file)
