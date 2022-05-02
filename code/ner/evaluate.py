@@ -36,7 +36,16 @@ parser.add_argument('--restore_file', default='best', help="name of the file in 
 
 def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
     """
+    ### Función `evaluate`
     Método que evalua el modelo con 'num_steps' batches
+
+    #### Parámetros:
+    * `model`: red neuronal
+    * `loss_fn`: función de pérdida (evalúa batch_output vs batch_labels)
+    * `data_iterator`: generador de batches de datos y etiquetas
+    * `metrics`: diccionario de funciones que calculan una medida entre los output y las verdaderas etiquetas para cada batch
+    * `params`: parámetros de entrenamiento
+    * `num_steps`: cantidad de batches sobre los que entrenar
     """
     
     """Evaluación del modelo"""
@@ -57,7 +66,7 @@ def evaluate(model, loss_fn, data_iterator, metrics, params, num_steps):
         output_batch = model(data_batch)
 
         """
-        Función de périda en este batch
+        Función de pérdida en este batch
         """
         loss = loss_fn(output_batch, labels_batch) 
 
