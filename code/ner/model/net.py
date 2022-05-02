@@ -22,14 +22,24 @@ import torch.nn.functional as F
 
 class Net(nn.Module):
     """
+    ### Clase 'Net'
     Definición de la clase red neuronal
     """
 
     def __init__(self, params):
         """
+        ### Constructor
         Se define una red neuronal recurrente para la obtención de entidades
         nombradas de un texto. Se compone de tres capas: capa lineal de embedding, 
         capa LSTM y capa 'fully-connceted'.
+        
+        #### Parámetros:
+            
+        * 'params': parámetros con 'vocab_size', 'embedding_dim' y 'lstm_hidden_dim'
+           
+        #### Devuelve:
+            
+        * Tres capas para la red nuronal
         """
 
 
@@ -75,7 +85,18 @@ class Net(nn.Module):
    
     def forward(self, s): 
         """
-        Función que, a partir de un batch input, obtiene las probablidades logits de los tokens
+        ### Función 'forward'
+        A partir de un batch input obtiene las probablidades logits de los tokens
+        
+        #### Parámetros:
+            
+        * 's': argumento con un 'lote' de oraciones organizados en filas
+        y de dimensión tamaño del batch x longitud frase más larga. A las
+        frases más cortas se le aplica padding.
+            
+        #### Devuelve:
+        
+        * probabilidades logits de los tokens
         """
 
         """
@@ -117,7 +138,17 @@ class Net(nn.Module):
 
 def loss_fn(outputs, labels): 
     """
-    método función de pérdida
+    ### Función 'loss_fn'
+    Método función de pérdida
+    
+    #### Parámetros:
+        
+    * 'outputs': resultados del modelo
+    * 'labels': las etiqeutas para evaluar la pérdida
+        
+    #### Devuelve:
+        
+    * La entro`pía cruzada de todos los tokens, menos los de padding
     """
 
 
@@ -150,8 +181,18 @@ def loss_fn(outputs, labels):
 
 def accuracy(outputs, labels):
     """
+    ### Función 'accuracy'
     Cálculo de la precisión a partir de las etiquetas y las salidas teniendo en cuenta los términos
-    # de padding
+    de padding
+    
+    #### Parámetros:
+        
+    * 'outputs': resultados del modelo
+    * 'labels': las etiqeutas para evaluar la pérdida
+        
+    #### Devuelve:
+        
+    * Tasa de acierto
     """
 
     """
@@ -169,7 +210,7 @@ def accuracy(outputs, labels):
     """
     outputs = np.argmax(outputs, axis=1) 
 
-    return np.sum(outputs == labels)/float(np.sum(mask)) """ precisión/tasa de acierto"""
+    return np.sum(outputs == labels)/float(np.sum(mask)) 
 
 
 metrics = {
